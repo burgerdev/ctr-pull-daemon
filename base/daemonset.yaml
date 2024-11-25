@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: ctr-pull
+  labels:
+    app: ctr-pull
+spec:
+  selector:
+    matchLabels:
+      app: ctr-pull
+  template:
+    metadata:
+      labels:
+        app: ctr-pull
+    spec:
+      serviceAccountName: ctr-pull
+      automountServiceAccountToken: true
+      containers:
+      - name: ctr-pull
+        image: nixery.dev/busybox/kubectl/jq/containerd
+        command: ["/bin/sh", "/scripts/entrypoint.sh"]
+        workingDir: /scripts
+        env:
+        - name: MYNODE
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        resources:
+          requests:
+            cpu: 10m
+            memory: 20Mi
+        volumeMounts:
+        - name: containerd-socket
+          mountPath: /run/containerd/containerd.sock
+        - name: scripts
+          mountPath: /scripts
+      volumes:
+      - name: containerd-socket
+        hostPath:
+          path: /run/containerd/containerd.sock
+          type: Socket
+      - name: scripts
+        configMap:
+          name: ctr-pull-scripts

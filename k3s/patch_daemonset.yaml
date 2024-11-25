@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: ctr-pull
+spec:
+  template:
+    spec:
+      volumes:
+      - name: containerd-socket
+        hostPath:
+          path: /run/k3s/containerd/containerd.sock
+          type: Socket

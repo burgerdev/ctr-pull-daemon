@@ -1,0 +1,9 @@
+resources:
+- daemonset.yaml
+- rbac.yaml
+configMapGenerator:
+- name: ctr-pull-scripts
+  files:
+  - entrypoint.sh
+  - functions.sh
+  - broken_images.jq
